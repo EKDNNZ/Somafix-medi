@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Mi Música - SomaFix</title>
+    <link rel="stylesheet" href="css/mitodo.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Mi Música</h1>
+        <form id="formGenero" style="display:none;">
+            <label>Nombre o género de música</label>
+            <input type="text" id="genero" required>
+            <button class="btn" type="submit">Guardar género</button>
+        </form>
+        <form id="formMusica">
+            <label>Nombre de la(s) canción(es)</label>
+            <textarea id="cancion" required placeholder="Puedes poner varias canciones, una por línea o separadas por coma"></textarea>
+            <div id="extras1" style="display:none;">
+                <label>Observaciones</label>
+                <input type="text" id="observaciones">
+                <label>Duración (minutos)</label>
+                <input type="number" id="duracion" min="0">
+            </div>
+            <div id="generoActual" style="display:none; margin-bottom:10px;">
+                <b>Género actual:</b> <span id="generoTexto"></span>
+                <button type="button" class="btn" id="cambiarGenero" style="margin-left:10px;">Cambiar género</button>
+            </div>
+            <button class="btn" type="submit">Añadir</button>
+        </form>
+        <ul id="listaMusica"></ul>
+        <button class="btn" onclick="window.history.back()">Volver</button>
+    </div>
+    <script>
+        let nombre = localStorage.getItem('sesionNombre');
+        let generoSeleccionado = localStorage.getItem("genero_" + nombre) || "";
+
+        function mostrarExtras() {
+            if (/^P00[1-6]$/.test(nombre)) {
+                document.getElementById('extras1').style.display = '';
+                document.getElementById('formGenero').style.display = 'none';
+                document.getElementById('generoActual').style.display = 'none';
+            } else if (/^P00[7-9]$|^P010$|^P011$/.test(nombre)) {
+                document.getElementById('extras1').style.display = 'none';
+                if (!generoSeleccionado) {
+                    document.getElementById('formGenero').style.display = '';
+                    document.getElementById('generoActual').style.display = 'none';
+                } else {
+                    document.getElementById('formGenero').style.display = 'none';
+                    document.getElementById('generoActual').style.display = '';
+                    document.getElementById('generoTexto').textContent = generoSeleccionado;
+                }
+            } else {
+                document.getElementById('extras1').style.display = 'none';
+                document.getElementById('formGenero').style.display = 'none';
+                document.getElementById('generoActual').style.display = 'none';
+            }
+        }
+        mostrarExtras();
+
+        // Guardar género para P007-P011
+        if (document.getElementById('formGenero')) {
+            document.getElementById('formGenero').onsubmit = function(e) {
+                e.preventDefault();
+                generoSeleccionado = document.getElementById('genero').value.trim();
+                if (generoSeleccionado) {
+                    localStorage.setItem("genero_" + nombre, generoSeleccionado);
+                    mostrarExtras();
+                }
+            };
+        }
+
+        // Cambiar género
+        if (document.getElementById('cambiarGenero')) {
+            document.getElementById('cambiarGenero').onclick = function() {
+                localStorage.removeItem("genero_" + nombre);
+                generoSeleccionado = "";
+                mostrarExtras();
+            };
+        }
+
+        function cargarMusica() {
+            let lista = JSON.parse(localStorage.getItem("musica_" + nombre) || "[]");
+            let ul = document.getElementById('listaMusica');
+            ul.innerHTML = "";
+            lista.forEach(function(item, idx) {
+                let li = document.createElement('li');
+                if (typeof item === "string") {
+                    li.textContent = item;
+                } else if (item.observaciones !== undefined || item.duracion !== undefined) {
+                    li.innerHTML = `<b>${item.cancion}</b>`;
+                    if (item.observaciones) li.innerHTML += ` | Observaciones: ${item.observaciones}`;
+                    if (item.duracion) li.innerHTML += ` | Duración: ${item.duracion} min`;
+                } else if (item.genero !== undefined) {
+                    li.innerHTML = `<b>${item.cancion}</b>`;
+                    if (item.genero) li.innerHTML += ` | Género: ${item.genero}`;
+                } else {
+                    li.textContent = item.cancion || item;
+                }
+                let btn = document.createElement('button');
+                btn.textContent = "Borrar";
+                btn.className = "btn";
+                btn.style.marginLeft = "10px";
+                btn.onclick = function() {
+                    lista.splice(idx, 1);
+                    localStorage.setItem("musica_" + nombre, JSON.stringify(lista));
+                    cargarMusica();
+                };
+                li.appendChild(btn);
+                ul.appendChild(li);
+            });
+        }
+
+        document.getElementById('formMusica').onsubmit = function(e) {
+            e.preventDefault();
+            let cancionesInput = document.getElementById('cancion').value.trim();
+            if (!cancionesInput) return;
+            // Separar por salto de línea o por coma
+            let canciones = cancionesInput.split(/\n|,/).map(c => c.trim()).filter(c => c);
+            let lista = JSON.parse(localStorage.getItem("musica_" + nombre) || "[]");
+            if (/^P00[1-6]$/.test(nombre)) {
+                canciones.forEach(function(cancion) {
+                    let item = {
+                        cancion: cancion,
+                        observaciones: document.getElementById('observaciones').value.trim(),
+                        duracion: document.getElementById('duracion').value.trim()
+                    };
+                    lista.push(item);
+                });
+            } else if (/^P00[7-9]$|^P010$|^P011$/.test(nombre)) {
+                if (!generoSeleccionado) {
+                    alert("Primero debes guardar el género.");
+                    return;
+                }
+                canciones.forEach(function(cancion) {
+                    let item = {
+                        cancion: cancion,
+                        genero: generoSeleccionado
+                    };
+                    lista.push(item);
+                });
+            } else {
+                canciones.forEach(function(cancion) {
+                    lista.push(cancion);
+                });
+            }
+            localStorage.setItem("musica_" + nombre, JSON.stringify(lista));
+            document.getElementById('formMusica').reset();
+            cargarMusica();
+        }
+        cargarMusica();
+    </script>
+</body>
+</html>
