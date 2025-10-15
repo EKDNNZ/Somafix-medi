@@ -1,0 +1,112 @@
+body {
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    background: linear-gradient(120deg, #f6d365 0%, #fda085 100%);
+    animation: gradientBG 8s ease-in-out infinite alternate;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+@keyframes gradientBG {
+    0% { background: linear-gradient(120deg, #f6d365 0%, #fda085 100%);}
+    100% { background: linear-gradient(120deg, #a1c4fd 0%, #c2e9fb 100%);}
+}
+
+.container {
+    background: rgba(255,255,255,0.92);
+    border-radius: 24px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.10);
+    padding: 40px 32px 32px 32px;
+    text-align: center;
+    min-width: 320px;
+    animation: popIn 1s cubic-bezier(.68,-0.55,.27,1.55);
+}
+
+@keyframes popIn {
+    0% { transform: scale(0.7); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+h1 {
+    font-size: 2.2rem;
+    color: #ff7e5f;
+    margin-bottom: 10px;
+    letter-spacing: 1px;
+    font-weight: bold;
+}
+
+.motivador {
+    color: #4f9da6;
+    font-size: 1.1rem;
+    margin-bottom: 24px;
+    font-weight: 500;
+    animation: fadeIn 2s;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.btn-group {
+    display: flex;
+    justify-content: center;
+    gap: 32px;
+    margin-bottom: 18px;
+}
+
+.btn {
+    padding: 18px 36px;
+    border: none;
+    border-radius: 30px;
+    font-size: 1.2rem;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 4px 16px rgba(255,126,95,0.15);
+    transition: transform 0.2s, box-shadow 0.2s, background 0.3s;
+    outline: none;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn.paciente {
+    background: linear-gradient(90deg, #ff7e5f, #feb47b);
+    color: #fff;
+}
+
+.btn.paciente:hover {
+    background: linear-gradient(90deg, #feb47b, #ff7e5f);
+    transform: scale(1.07) rotate(-2deg);
+}
+
+.btn.doctor {
+    background: linear-gradient(90deg, #43cea2, #185a9d);
+    color: #fff;
+}
+
+.btn.doctor:hover {
+    background: linear-gradient(90deg, #185a9d, #43cea2);
+    transform: scale(1.07) rotate(2deg);
+}
+
+/* Burbujas animadas */
+.bubbles {
+    position: fixed;
+    top: 0; left: 0; width: 100vw; height: 100vh;
+    pointer-events: none;
+    z-index: 0;
+}
+.bubble {
+    position: absolute;
+    bottom: -100px;
+    background: rgba(255,255,255,0.3);
+    border-radius: 50%;
+    animation: floatUp 10s linear infinite;
+}
+@keyframes floatUp {
+    0% { transform: translateY(0) scale(1);}
+    100% { transform: translateY(-110vh) scale(1.2);}
+}
