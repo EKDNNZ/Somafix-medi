@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Iniciar Sesión Paciente - SomaFix</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/iniciar.css">
+</head>
+<body>
+    <div class="bubbles">
+        <div class="bubble" style="left:15%; width:30px; height:30px; animation-delay:0s;"></div>
+        <div class="bubble" style="left:40%; width:50px; height:50px; animation-delay:2s;"></div>
+        <div class="bubble" style="left:65%; width:25px; height:25px; animation-delay:1s;"></div>
+        <div class="bubble" style="left:80%; width:35px; height:35px; animation-delay:3s;"></div>
+        <div class="bubble" style="left:60%; width:60px; height:60px; animation-delay:4s;"></div>
+    </div>
+    <div class="container">
+        <h1>Iniciar Sesión Paciente</h1>
+        <form class="form" id="form-inicio-paciente">
+            <input type="text" id="nombrePacienteLogin" placeholder="Usuario (PA001...PA011)" required>
+            <input type="password" id="passPacienteLogin" placeholder="Contraseña (001...011)" required>
+            <button type="submit" class="btn">Iniciar Sesión</button>
+        </form>
+        <p id="errorMsg" style="color:red;"></p>
+    </div>
+    <script>
+        // Cuentas predefinidas de pacientes
+        const pacientes = {};
+        for(let i=1; i<=11; i++) {
+            let num = i.toString().padStart(3, '0');
+            pacientes['PA'+num] = { nombre: 'PA'+num, pass: num };
+        }
+
+        document.getElementById('form-inicio-paciente').onsubmit = function(e) {
+            e.preventDefault();
+            const nombre = document.getElementById('nombrePacienteLogin').value.trim().toUpperCase();
+            const pass = document.getElementById('passPacienteLogin').value.trim();
+            if (pacientes[nombre] && pacientes[nombre].pass === pass) {
+                localStorage.setItem('sesionTipo', 'paciente');
+                localStorage.setItem('sesionNombre', nombre);
+                window.location.href = 'principal_paciente.html';
+            } else {
+                document.getElementById('errorMsg').textContent = 'Usuario o contraseña incorrectos.';
+            }
+        }
+    </script>
+</body>
+</html>
