@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Datos de los Pacientes - SomaFix</title>
+    <link rel="stylesheet" href="css/mitodo.css">
+    <script src="datos_pacientes.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>Datos de los 7 pacientes</h1>
+        <div id="datosPacientes"></div>
+        <button class="btn" onclick="window.history.back()">Volver</button>
+    </div>
+    <script>
+        let html = "";
+        for (let p in datosPacientes) {
+            let d = datosPacientes[p];
+            html += `<div style="margin-bottom:15px; border-bottom:1px solid #ccc;">
+                <b>${p}</b><br>
+                ${d.nombre}<br>
+                <i>${d.observaciones}</i><br>
+                <b>Recomendación:</b> ${d.recomendacion}<br>
+                <b>Objetivo:</b> ${d.objetivo}<br>
+            </div>`;
+        }
+        document.getElementById('datosPacientes').innerHTML = html;
+    </script>
+</body>
+</html>
