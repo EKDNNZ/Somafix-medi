@@ -1,0 +1,127 @@
+body {
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    background: linear-gradient(120deg, #fbc2eb 0%, #a6c1ee 100%);
+    animation: gradientBG 8s ease-in-out infinite alternate;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+@keyframes gradientBG {
+    0% { background: linear-gradient(120deg, #fbc2eb 0%, #a6c1ee 100%);}
+    100% { background: linear-gradient(120deg, #fcb69f 0%, #ffecd2 100%);}
+}
+
+.container {
+    background: rgba(255,255,255,0.92);
+    border-radius: 24px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.10);
+    padding: 40px 32px 32px 32px;
+    text-align: center;
+    min-width: 320px;
+    animation: popIn 1s cubic-bezier(.68,-0.55,.27,1.55);
+}
+
+@keyframes popIn {
+    0% { transform: scale(0.7); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+h1 {
+    font-size: 2.2rem;
+    color: #7f53ac;
+    margin-bottom: 10px;
+    letter-spacing: 1px;
+    font-weight: bold;
+}
+
+.motivador {
+    color: #4f9da6;
+    font-size: 1.1rem;
+    margin-bottom: 24px;
+    font-weight: 500;
+    animation: fadeIn 2s;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    margin-bottom: 18px;
+}
+
+.form input {
+    padding: 12px;
+    border-radius: 20px;
+    border: 1px solid #a6c1ee;
+    font-size: 1rem;
+    outline: none;
+    transition: border 0.2s;
+}
+
+.form input:focus {
+    border: 1.5px solid #7f53ac;
+    background: #f3f0fa;
+}
+
+.btn {
+    padding: 12px 0;
+    border: none;
+    border-radius: 20px;
+    background: linear-gradient(90deg, #7f53ac, #647dee);
+    color: #fff;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 4px 16px rgba(127,83,172,0.12);
+    transition: transform 0.2s, box-shadow 0.2s, background 0.3s;
+}
+
+.btn:hover {
+    transform: scale(1.05);
+    background: linear-gradient(90deg, #647dee, #7f53ac);
+    box-shadow: 0 8px 24px rgba(127,83,172,0.18);
+}
+
+.switch {
+    margin-top: 8px;
+    font-size: 0.97rem;
+    color: #888;
+}
+
+.switch a {
+    color: #7f53ac;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.switch a:hover {
+    text-decoration: underline;
+}
+
+/* Burbujas animadas */
+.bubbles {
+    position: fixed;
+    top: 0; left: 0; width: 100vw; height: 100vh;
+    pointer-events: none;
+    z-index: 0;
+}
+.bubble {
+    position: absolute;
+    bottom: -100px;
+    background: rgba(255,255,255,0.3);
+    border-radius: 50%;
+    animation: floatUp 10s linear infinite;
+}
+@keyframes floatUp {
+    0% { transform: translateY(0) scale(1);}
+    100% { transform: translateY(-110vh) scale(1.2);}
+}
