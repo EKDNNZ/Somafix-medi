@@ -2,19 +2,110 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Panel Doctor - SomaFix</title>
-    <link rel="stylesheet" href="mitodo.css">
+    <link rel="stylesheet" href="css/mitodo.css">
     <script src="datos_pacientes.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .modal-bg {
+            position: fixed;
+            inset: 0;
+            background: rgba(40,60,90,0.25);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        .modal-bg.active {
+            display: flex;
+        }
+        .modal {
+            background: #fff;
+            border-radius: 18px;
+            box-shadow: 0 8px 32px #5b7fff33;
+            padding: 32px 24px 24px 24px;
+            max-width: 90vw;
+            min-width: 340px;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            animation: modalIn 0.5s cubic-bezier(.68,-0.55,.27,1.55);
+        }
+        @keyframes modalIn {
+            from { opacity: 0; transform: scale(0.8);}
+            to   { opacity: 1; transform: scale(1);}
+        }
+        .modal-close {
+            position: absolute;
+            top: 16px; right: 18px;
+            font-size: 1.7rem;
+            color: #5b7fff;
+            cursor: pointer;
+            font-weight: bold;
+            transition: color 0.2s;
+        }
+        .modal-close:hover {
+            color: #ff4d4d;
+        }
+        .tabla-dinamica {
+            border-collapse: collapse;
+            margin: 0 auto 24px auto;
+            background: #f8fafc;
+            font-size: 1rem;
+        }
+        .tabla-dinamica th, .tabla-dinamica td {
+            border: 1px solid #b5c7e7;
+            padding: 7px 10px;
+            text-align: center;
+        }
+        .tabla-dinamica th {
+            background: #e0e7ef;
+            font-weight: 600;
+        }
+        .tabla-dinamica tr:hover td {
+            background: #f0f4fa;
+        }
+        .grafico-container {
+            max-width: 600px;
+            margin: 30px auto 40px auto;
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 2px 12px #b5c7e733;
+            padding: 24px 12px 12px 12px;
+        }
+        .apartado-comparativa {
+            margin-top: 60px;
+            padding: 24px 12px;
+            background: #f5f7fa;
+            border-radius: 18px;
+            box-shadow: 0 2px 12px #b5c7e722;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .container {
+            max-width: 900px;
+            margin: 40px auto;
+        }
+        .info-paciente {
+            margin-bottom:18px; 
+            text-align:left; 
+            background:#f5f7fa; 
+            border-radius:10px; 
+            padding:12px 18px;
+        }
+        @media (max-width: 600px) {
+            .modal { min-width: 0; padding: 12px 2vw 12px 2vw;}
+            .grafico-container, .apartado-comparativa { padding: 10px 2vw;}
+        }
+    </style>
 </head>
 <body>
     <div class="container">
         <h1>Panel del Doctor</h1>
-        <a href="datos2.html" class="btn">Ver datos de los 7 pacientes</a>
         <hr>
-        <h2>Ver respuestas del cuestionario</h2>
-        <label>Selecciona mes:</label>
-        <input type="month" id="mes" value="2025-07">
-        <label style="margin-left:10px;">Selecciona paciente:</label>
+        <h2>Selecciona un paciente para ver sus resultados</h2>
         <select id="pacienteSelect">
             <option value="">-- Elige un paciente --</option>
             <option value="P001">P001</option>
@@ -25,186 +116,158 @@
             <option value="P006">P006</option>
             <option value="P007">P007</option>
         </select>
-        <div id="respuestasMes" style="margin-top:20px;"></div>
-        <button class="btn" onclick="window.history.back()">Volver</button>
+        <button class="btn" onclick="window.history.back()" style="margin-top:30px;">Volver</button>
+        <div class="apartado-comparativa">
+            <h2 style="text-align:center;">Comparativa de mejora entre pacientes</h2>
+            <canvas id="graficoComparativa" style="max-width:100%;"></canvas>
+        </div>
+    </div>
+    <!-- Modal para resultados de paciente -->
+    <div class="modal-bg" id="modalPaciente">
+        <div class="modal">
+            <span class="modal-close" onclick="cerrarModal()">&times;</span>
+            <h2 id="modalTitulo"></h2>
+            <div id="tablaModal"></div>
+            <div class="grafico-container">
+                <canvas id="graficoDolor" style="max-width:100%;"></canvas>
+            </div>
+        </div>
     </div>
     <script>
-        // Simulación personalizada de respuestas de julio 2025
-        function simularJulio(nombre, year) {
-            let diasJulio = 31;
-            for (let d = 1; d <= diasJulio; d++) {
-                let dia = d.toString().padStart(2, '0');
-                let fecha = year + '-07-' + dia;
-                let key = "calendario_" + nombre + "_" + fecha;
-                if (!localStorage.getItem(key)) {
-                    let reg = generarRespuestasPaciente(nombre, d);
-                    localStorage.setItem(key, JSON.stringify([reg]));
-                }
+    // --- Información básica de los pacientes ---
+    const infoPacientes = {
+        P001: { nombre: "P001", edad: 52, diagnostico: "Cervicalgia crónica", grupo: "Ondas" },
+        P002: { nombre: "P002", edad: 47, diagnostico: "Dolor neuropático", grupo: "Ondas" },
+        P003: { nombre: "P003", edad: 60, diagnostico: "Ciática", grupo: "Ondas" },
+        P004: { nombre: "P004", edad: 55, diagnostico: "Lumbalgia crónica", grupo: "Ondas" },
+        P005: { nombre: "P005", edad: 49, diagnostico: "Lumbalgia crónica", grupo: "Música" },
+        P006: { nombre: "P006", edad: 44, diagnostico: "Fibromialgia y depresión", grupo: "Música" },
+        P007: { nombre: "P007", edad: 38, diagnostico: "Migraña crónica y depresión", grupo: "Música" }
+    };
+
+    function cerrarModal() {
+        document.getElementById('modalPaciente').classList.remove('active');
+        if (window.graficoDolorObj) window.graficoDolorObj.destroy();
+    }
+
+    document.getElementById('pacienteSelect').onchange = function() {
+        let nombre = this.value;
+        if (!nombre) return cerrarModal();
+        let mes = "2025-07";
+        let dias = 31;
+        let datos = [];
+        for (let d = 1; d <= dias; d++) {
+            let diaStr = d.toString().padStart(2, '0');
+            let fecha = mes + '-' + diaStr;
+            let key = "calendario_" + nombre + "_" + fecha;
+            let lista = JSON.parse(localStorage.getItem(key) || "[]");
+            if (lista.length > 0) {
+                let reg = lista[0];
+                reg.fecha = fecha;
+                datos.push(reg);
             }
         }
-
-        // Respuestas diferentes por paciente y día
-        function generarRespuestasPaciente(nombre, dia) {
-            switch (nombre) {
-                case 'P001': // Cervicalgia crónica, mejora leve, peor dolor mañana
-                    return {
-                        dolorMin: Math.max(3, 5 - Math.floor((dia-1)/15)), // 5 -> 4
-                        dolorMax: Math.max(5, 7 - Math.floor((dia-1)/10)), // 7 -> 6
-                        momentoPeorDolor: "Mañana (7h–13h)",
-                        tiempoDolor: dia < 16 ? "Entre 30 minutos y 2 horas" : "Menos de 30 minutos",
-                        afectaActividades: dia < 20 ? "Poco" : "Nada",
-                        emocion: dia < 10 ? "Tranquilo/a" : (dia < 20 ? "Feliz" : "Feliz"),
-                        musicaAyuda: dia < 20 ? "Sí" : "Sí",
-                        movilidad: "Sí",
-                        sueno: dia < 16 ? "Bien" : "Muy bien",
-                        musicaHoy: "Sí, durante todo el tiempo",
-                        tipoMusica: "Relajante",
-                        otroTipoMusica: "",
-                        despuesMusica: dia < 20 ? "Más tranquilo/a" : "Más tranquilo/a"
-                    };
-                case 'P002': // Dolor neuropático, depresión, mejora leve, peor dolor tarde
-                    return {
-                        dolorMin: Math.max(4, 6 - Math.floor((dia-1)/12)), // 6 -> 5
-                        dolorMax: Math.max(6, 8 - Math.floor((dia-1)/10)), // 8 -> 6
-                        momentoPeorDolor: "Tarde (17h–20h)",
-                        tiempoDolor: dia < 20 ? "Más de 2 horas" : "Entre 30 minutos y 2 horas",
-                        afectaActividades: dia < 15 ? "Bastante" : "Poco",
-                        emocion: dia < 10 ? "Triste" : (dia < 20 ? "Ansioso/a" : "Tranquilo/a"),
-                        musicaAyuda: dia < 20 ? "No estoy seguro/a" : "Sí",
-                        movilidad: dia < 20 ? "Con dificultad" : "Sí",
-                        sueno: dia < 16 ? "Mal" : "Bien",
-                        musicaHoy: dia < 16 ? "Un rato" : "Sí, durante todo el tiempo",
-                        tipoMusica: "Triste",
-                        otroTipoMusica: "",
-                        despuesMusica: dia < 20 ? "Igual" : "Más tranquilo/a"
-                    };
-                case 'P003': // Ciática, mejora leve, peor dolor tarde
-                    return {
-                        dolorMin: Math.max(2, 4 - Math.floor((dia-1)/20)), // 4 -> 3
-                        dolorMax: Math.max(4, 6 - Math.floor((dia-1)/15)), // 6 -> 4
-                        momentoPeorDolor: "Tarde (17h–20h)",
-                        tiempoDolor: dia < 20 ? "Menos de 30 minutos" : "Menos de 30 minutos",
-                        afectaActividades: dia < 15 ? "Poco" : "Nada",
-                        emocion: dia < 10 ? "Feliz" : (dia < 20 ? "Tranquilo/a" : "Feliz"),
-                        musicaAyuda: "Sí",
-                        movilidad: "Sí",
-                        sueno: dia < 16 ? "Muy bien" : "Muy bien",
-                        musicaHoy: "Sí, durante todo el tiempo",
-                        tipoMusica: "Alegre",
-                        otroTipoMusica: "",
-                        despuesMusica: "Más tranquilo/a"
-                    };
-                case 'P004': // Lumbalgia crónica, mejora leve, peor dolor noche
-                    return {
-                        dolorMin: Math.max(3, 5 - Math.floor((dia-1)/20)), // 5 -> 4
-                        dolorMax: Math.max(5, 7 - Math.floor((dia-1)/15)), // 7 -> 5
-                        momentoPeorDolor: "Noche (20h–24h)",
-                        tiempoDolor: dia < 20 ? "Más de 2 horas" : "Entre 30 minutos y 2 horas",
-                        afectaActividades: dia < 15 ? "Bastante" : "Poco",
-                        emocion: dia < 10 ? "Ansioso/a" : (dia < 20 ? "Tranquilo/a" : "Feliz"),
-                        musicaAyuda: dia < 20 ? "Sí" : "Sí",
-                        movilidad: dia < 20 ? "Con dificultad" : "Sí",
-                        sueno: dia < 16 ? "Bien" : "Muy bien",
-                        musicaHoy: "Un rato",
-                        tipoMusica: "Relajante",
-                        otroTipoMusica: "",
-                        despuesMusica: "Más tranquilo/a"
-                    };
-                case 'P005': // Lumbalgia crónica, música, mejor progreso, peor dolor noche
-                    return {
-                        dolorMin: Math.max(1, 4 - Math.floor((dia-1)/8)), // 4 -> 1
-                        dolorMax: Math.max(3, 6 - Math.floor((dia-1)/7)), // 6 -> 3
-                        momentoPeorDolor: "Noche (20h–24h)",
-                        tiempoDolor: dia < 10 ? "Entre 30 minutos y 2 horas" : (dia < 20 ? "Menos de 30 minutos" : "Menos de 30 minutos"),
-                        afectaActividades: dia < 10 ? "Poco" : (dia < 20 ? "Nada" : "Nada"),
-                        emocion: dia < 10 ? "Tranquilo/a" : (dia < 20 ? "Feliz" : "Feliz"),
-                        musicaAyuda: "Sí",
-                        movilidad: "Sí",
-                        sueno: dia < 16 ? "Bien" : "Muy bien",
-                        musicaHoy: "Sí, durante todo el tiempo",
-                        tipoMusica: "Relajante",
-                        otroTipoMusica: "",
-                        despuesMusica: dia < 20 ? "Más tranquilo/a" : "Más tranquilo/a"
-                    };
-                case 'P006': // Fibromialgia y depresión, música, mejor progreso, peor dolor mañana
-                    return {
-                        dolorMin: Math.max(2, 5 - Math.floor((dia-1)/7)), // 5 -> 2
-                        dolorMax: Math.max(4, 8 - Math.floor((dia-1)/6)), // 8 -> 4
-                        momentoPeorDolor: "Mañana (7h–13h)",
-                        tiempoDolor: dia < 10 ? "Más de 2 horas" : (dia < 20 ? "Entre 30 minutos y 2 horas" : "Menos de 30 minutos"),
-                        afectaActividades: dia < 10 ? "Mucho" : (dia < 20 ? "Bastante" : "Poco"),
-                        emocion: dia < 10 ? "Irritable" : (dia < 20 ? "Ansioso/a" : "Tranquilo/a"),
-                        musicaAyuda: dia < 20 ? "No" : "Sí",
-                        movilidad: dia < 20 ? "Con dificultad" : "Sí",
-                        sueno: dia < 16 ? "Mal" : "Bien",
-                        musicaHoy: "Sí, durante todo el tiempo",
-                        tipoMusica: "Otro",
-                        otroTipoMusica: "528 Hz",
-                        despuesMusica: dia < 20 ? "Igual" : "Más tranquilo/a"
-                    };
-                case 'P007': // Migraña crónica y depresión, música, mejor progreso, peor dolor mañana
-                    return {
-                        dolorMin: Math.max(2, 6 - Math.floor((dia-1)/9)), // 6 -> 2
-                        dolorMax: Math.max(3, 7 - Math.floor((dia-1)/8)), // 7 -> 3
-                        momentoPeorDolor: "Mañana (7h–13h)",
-                        tiempoDolor: dia < 10 ? "Más de 2 horas" : (dia < 20 ? "Entre 30 minutos y 2 horas" : "Menos de 30 minutos"),
-                        afectaActividades: dia < 10 ? "Bastante" : (dia < 20 ? "Poco" : "Nada"),
-                        emocion: dia < 10 ? "Ansioso/a" : (dia < 20 ? "Tranquilo/a" : "Feliz"),
-                        musicaAyuda: dia < 20 ? "Sí" : "Sí",
-                        movilidad: dia < 20 ? "Con dificultad" : "Sí",
-                        sueno: dia < 16 ? "Mal" : "Muy bien",
-                        musicaHoy: "Sí, durante todo el tiempo",
-                        tipoMusica: "Relajante",
-                        otroTipoMusica: "",
-                        despuesMusica: dia < 20 ? "Más tranquilo/a" : "Más tranquilo/a"
-                    };
-                default:
-                    return {};
-            }
+        if (!datos.length) {
+            document.getElementById('tablaModal').innerHTML = "<p>No hay registros para este paciente.</p>";
+            document.getElementById('modalTitulo').textContent = "";
+            document.getElementById('modalPaciente').classList.add('active');
+            return;
         }
 
-        function mostrarRespuestasMes() {
-            let mes = document.getElementById('mes').value; // formato YYYY-MM
-            let nombre = document.getElementById('pacienteSelect').value;
-            let cont = document.getElementById('respuestasMes');
-            cont.innerHTML = "";
-            if (!mes || !nombre) return;
+        // --- Info paciente ---
+        let info = infoPacientes[nombre];
+        let infoHtml = `
+            <div class="info-paciente">
+                <b>Nombre:</b> ${info.nombre}<br>
+                <b>Edad:</b> ${info.edad} años<br>
+                <b>Diagnóstico:</b> ${info.diagnostico}<br>
+                <b>Grupo:</b> ${info.grupo}
+            </div>
+        `;
 
-            // Simula respuestas de julio si no existen
-            let year = mes.split('-')[0];
-            let month = mes.split('-')[1];
-            if (month === "07") simularJulio(nombre, year);
+        // Preguntas a mostrar
+        const preguntas = [
+            {campo:"dolorMin", texto:"Dolor mínimo"},
+            {campo:"dolorMax", texto:"Dolor máximo"},
+            {campo:"emocion", texto:"Emoción"},
+            {campo:"afectaActividades", texto:"Afecta actividades"},
+            {campo:"sueno", texto:"Sueño"},
+            {campo:"musicaHoy", texto:"Música hoy"},
+            {campo:"movilidad", texto:"Movilidad"},
+            {campo:"momentoPeorDolor", texto:"Peor momento"},
+            {campo:"tiempoDolor", texto:"Tiempo dolor"}
+        ];
 
-            let dias = new Date(year, month, 0).getDate();
-            let html = `<h3>Respuestas de ${nombre} en ${mes}</h3>`;
-            let hayDatos = false;
-            for (let d = 1; d <= dias; d++) {
-                let dia = d.toString().padStart(2, '0');
-                let fecha = mes + '-' + dia;
-                let key = "calendario_" + nombre + "_" + fecha;
-                let lista = JSON.parse(localStorage.getItem(key) || "[]");
-                if (lista.length > 0) {
-                    hayDatos = true;
-                    lista.forEach(function(reg, idx) {
-                        html += `<div style="margin-bottom:10px; border-bottom:1px solid #ccc;">
-                            <b>${fecha}</b><br>
-                            Dolor mínimo: ${reg.dolorMin || ''} | Dolor máximo: ${reg.dolorMax || ''}<br>
-                            Peor momento: ${reg.momentoPeorDolor || ''} | Tiempo dolor: ${reg.tiempoDolor || ''}<br>
-                            Afecta actividades: ${reg.afectaActividades || ''}<br>
-                            Emoción: ${reg.emocion || ''} | Música ayuda: ${reg.musicaAyuda || ''}<br>
-                            Movilidad: ${reg.movilidad || ''} | Sueño: ${reg.sueno || ''}<br>
-                            Música hoy: ${reg.musicaHoy || ''} | Tipo música: ${reg.tipoMusica || ''} ${reg.otroTipoMusica ? '('+reg.otroTipoMusica+')' : ''}<br>
-                            Después música: ${reg.despuesMusica || ''}
-                        </div>`;
-                    });
-                }
+        // Tabla dinámica: días arriba, preguntas a la izquierda
+        let tabla = `<table class="tabla-dinamica"><thead><tr><th>Pregunta / Día</th>`;
+        datos.forEach(reg => {
+            tabla += `<th>${reg.fecha.slice(-2)}</th>`;
+        });
+        tabla += `</tr></thead><tbody>`;
+        preguntas.forEach(p => {
+            tabla += `<tr><th>${p.texto}</th>`;
+            datos.forEach(reg => {
+                tabla += `<td>${reg[p.campo] ?? ''}</td>`;
+            });
+            tabla += `</tr>`;
+        });
+        tabla += `</tbody></table>`;
+        document.getElementById('tablaModal').innerHTML = infoHtml + tabla;
+        document.getElementById('modalTitulo').textContent = `Resultados de ${nombre} (Julio 2025)`;
+        document.getElementById('modalPaciente').classList.add('active');
+
+        // Gráfico de dolor
+        let labels = datos.map(r => r.fecha.slice(-2));
+        let dolorMin = datos.map(r => r.dolorMin ?? null);
+        let dolorMax = datos.map(r => r.dolorMax ?? null);
+        let ctx = document.getElementById('graficoDolor').getContext('2d');
+        if (window.graficoDolorObj) window.graficoDolorObj.destroy();
+        window.graficoDolorObj = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [
+                    { label: 'Dolor mínimo', data: dolorMin, borderColor: '#4fd1c5', backgroundColor: '#4fd1c588', fill: false, tension: 0.2 },
+                    { label: 'Dolor máximo', data: dolorMax, borderColor: '#5b7fff', backgroundColor: '#5b7fff88', fill: false, tension: 0.2 }
+                ]
+            },
+            options: {
+                plugins: { legend: { position: 'top' } },
+                scales: { y: { min: 0, max: 10, title: { display: true, text: 'Dolor (0-10)' } } }
             }
-            cont.innerHTML = hayDatos ? html : "No hay registros para este mes.";
-        }
+        });
+    };
 
-        document.getElementById('mes').onchange = mostrarRespuestasMes;
-        document.getElementById('pacienteSelect').onchange = mostrarRespuestasMes;
+    // --- Comparativa de mejora entre pacientes ---
+    function mostrarComparativa() {
+        // Simulación: la mayoría mejora poco, uno no mejora nada (P004)
+        let pacientes = [
+            {id:"P001", nombre:"P001"}, {id:"P002", nombre:"P002"}, {id:"P003", nombre:"P003"}, {id:"P004", nombre:"P004"},
+            {id:"P005", nombre:"P005"}, {id:"P006", nombre:"P006"}, {id:"P007", nombre:"P007"}
+        ];
+        let mes = "2025-07";
+        // Puedes ajustar estos valores para que se vea el cambio mínimo
+        let dolorInicio = [8, 7, 6, 9, 7, 8, 6];
+        let dolorFin    = [7, 6, 5, 9, 6, 7, 5]; // P004 no mejora (9->9), los demás bajan 1 punto
+        let grupo = ["Ondas","Ondas","Ondas","Ondas","Música","Música","Música"];
+        let ctx = document.getElementById('graficoComparativa').getContext('2d');
+        if (window.graficoComparativaObj) window.graficoComparativaObj.destroy();
+        window.graficoComparativaObj = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: pacientes.map(p=>p.nombre),
+                datasets: [
+                    { label: 'Dolor máximo Día 1', data: dolorInicio, backgroundColor: grupo.map(g=>g=="Música"?"#4fd1c5":"#5b7fff") },
+                    { label: 'Dolor máximo Día 31', data: dolorFin, backgroundColor: grupo.map(g=>g=="Música"?"#4fd1c588":"#5b7fff88") }
+                ]
+            },
+            options: {
+                plugins: { legend: { position: 'top' } },
+                scales: { y: { min: 0, max: 10, title: { display: true, text: 'Dolor máximo (0-10)' } } }
+            }
+        });
+    }
+    mostrarComparativa();
     </script>
 </body>
 </html>
-
