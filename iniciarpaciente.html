@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Iniciar Sesión Paciente - SomaFix</title>
+    <link rel="stylesheet" href="css/mitodo.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Iniciar Sesión Paciente</h1>
+        <form id="form-inicio-paciente" autocomplete="off">
+            <input type="text" id="nombrePacienteLogin" placeholder="Usuario (P001...P007)" required>
+            <input type="password" id="passPacienteLogin" placeholder="Contraseña (001...007)" required>
+            <button type="submit" class="btn">Iniciar Sesión</button>
+        </form>
+        <p id="errorMsg" style="color:red;"></p>
+    </div>
+    <script>
+        // Solo 7 pacientes
+        const pacientes = {
+            'P001': { nombre: 'P001', pass: '001' },
+            'P002': { nombre: 'P002', pass: '002' },
+            'P003': { nombre: 'P003', pass: '003' },
+            'P004': { nombre: 'P004', pass: '004' },
+            'P005': { nombre: 'P005', pass: '005' },
+            'P006': { nombre: 'P006', pass: '006' },
+            'P007': { nombre: 'P007', pass: '007' }
+        };
+
+        document.getElementById('form-inicio-paciente').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const nombre = document.getElementById('nombrePacienteLogin').value.trim().toUpperCase();
+            const pass = document.getElementById('passPacienteLogin').value.trim();
+            if (pacientes[nombre] && pacientes[nombre].pass === pass) {
+                localStorage.setItem('sesionTipo', 'paciente');
+                localStorage.setItem('sesionNombre', nombre);
+                window.location.href = 'panelprincipal.html';
+            } else {
+                document.getElementById('errorMsg').textContent = 'Usuario o contraseña incorrectos.';
+            }
+        });
+    </script>
+</body>
+</html>
