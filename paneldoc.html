@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Panel Doctor - SomaFix</title>
-    <link rel="stylesheet" href="css/mitodo.css">
+    <link rel="stylesheet" href="mitodo.css">
     <script src="datos_pacientes.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
@@ -95,9 +95,25 @@
             border-radius:10px; 
             padding:12px 18px;
         }
+        .btn-ver {
+            margin: 8px 4px 8px 0;
+            padding: 8px 18px;
+            border-radius: 7px;
+            border: none;
+            background: linear-gradient(90deg, #5b7fff 0%, #4fd1c5 100%);
+            color: #fff;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.2s;
+        }
+        .btn-ver:hover {
+            background: linear-gradient(90deg, #4fd1c5 0%, #5b7fff 100%);
+            transform: translateY(-2px) scale(1.03);
+        }
         @media (max-width: 600px) {
             .modal { min-width: 0; padding: 12px 2vw 12px 2vw;}
             .grafico-container, .apartado-comparativa { padding: 10px 2vw;}
+            .container { padding: 0 2vw; }
         }
     </style>
 </head>
@@ -105,18 +121,17 @@
     <div class="container">
         <h1>Panel del Doctor</h1>
         <hr>
-        <h2>Selecciona un paciente para ver sus resultados</h2>
-        <select id="pacienteSelect">
-            <option value="">-- Elige un paciente --</option>
-            <option value="P001">P001</option>
-            <option value="P002">P002</option>
-            <option value="P003">P003</option>
-            <option value="P004">P004</option>
-            <option value="P005">P005</option>
-            <option value="P006">P006</option>
-            <option value="P007">P007</option>
-        </select>
-        <button class="btn" onclick="window.history.back()" style="margin-top:30px;">Volver</button>
+        <h2>Ver resultados de los pacientes</h2>
+        <div id="botonesPacientes" style="margin-bottom:24px;">
+            <button class="btn-ver" onclick="mostrarDatosPaciente('P001')">Ver P001</button>
+            <button class="btn-ver" onclick="mostrarDatosPaciente('P002')">Ver P002</button>
+            <button class="btn-ver" onclick="mostrarDatosPaciente('P003')">Ver P003</button>
+            <button class="btn-ver" onclick="mostrarDatosPaciente('P004')">Ver P004</button>
+            <button class="btn-ver" onclick="mostrarDatosPaciente('P005')">Ver P005</button>
+            <button class="btn-ver" onclick="mostrarDatosPaciente('P006')">Ver P006</button>
+            <button class="btn-ver" onclick="mostrarDatosPaciente('P007')">Ver P007</button>
+        </div>
+        <button class="btn" onclick="window.history.back()" style="margin-top:10px;">Volver</button>
         <div class="apartado-comparativa">
             <h2 style="text-align:center;">Comparativa de mejora entre pacientes</h2>
             <canvas id="graficoComparativa" style="max-width:100%;"></canvas>
@@ -150,9 +165,7 @@
         if (window.graficoDolorObj) window.graficoDolorObj.destroy();
     }
 
-    document.getElementById('pacienteSelect').onchange = function() {
-        let nombre = this.value;
-        if (!nombre) return cerrarModal();
+    function mostrarDatosPaciente(nombre) {
         let mes = "2025-07";
         let dias = 31;
         let datos = [];
@@ -236,7 +249,7 @@
                 scales: { y: { min: 0, max: 10, title: { display: true, text: 'Dolor (0-10)' } } }
             }
         });
-    };
+    }
 
     // --- Comparativa de mejora entre pacientes ---
     function mostrarComparativa() {
@@ -245,7 +258,6 @@
             {id:"P001", nombre:"P001"}, {id:"P002", nombre:"P002"}, {id:"P003", nombre:"P003"}, {id:"P004", nombre:"P004"},
             {id:"P005", nombre:"P005"}, {id:"P006", nombre:"P006"}, {id:"P007", nombre:"P007"}
         ];
-        let mes = "2025-07";
         // Puedes ajustar estos valores para que se vea el cambio mínimo
         let dolorInicio = [8, 7, 6, 9, 7, 8, 6];
         let dolorFin    = [7, 6, 5, 9, 6, 7, 5]; // P004 no mejora (9->9), los demás bajan 1 punto
