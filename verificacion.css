@@ -1,0 +1,53 @@
+body {
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    background: linear-gradient(120deg, #a8edea 0%, #fed6e3 100%);
+    font-family: 'Segoe UI', Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.container {
+    background: rgba(255,255,255,0.95);
+    border-radius: 24px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.10);
+    padding: 40px 32px 32px 32px;
+    text-align: center;
+    min-width: 320px;
+    animation: popIn 1s cubic-bezier(.68,-0.55,.27,1.55);
+}
+@keyframes popIn {
+    0% { transform: scale(0.7); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+}
+h1 {
+    font-size: 2.2rem;
+    color: #ff8c94;
+    margin-bottom: 10px;
+    letter-spacing: 1px;
+    font-weight: bold;
+}
+.motivador {
+    color: #4f9da6;
+    font-size: 1.1rem;
+    margin-bottom: 24px;
+    font-weight: 500;
+}
+.btn {
+    padding: 12px 0;
+    border: none;
+    border-radius: 20px;
+    background: linear-gradient(90deg, #ff8c94, #fcb69f);
+    color: #fff;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 4px 16px rgba(255,140,148,0.12);
+    transition: transform 0.2s, box-shadow 0.2s, background 0.3s;
+}
+.btn:hover {
+    transform: scale(1.05);
+    background: linear-gradient(90deg, #fcb69f, #ff8c94);
+    box-shadow: 0 8px 24px rgba(255,140,148,0.18);
+}
