@@ -1,0 +1,104 @@
+body {
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    background: linear-gradient(120deg, #f6d365 0%, #fda085 100%);
+    font-family: 'Segoe UI', Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.container {
+    background: rgba(255,255,255,0.97);
+    border-radius: 22px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.10);
+    padding: 40px 32px 32px 32px;
+    text-align: center;
+    min-width: 320px;
+    max-width: 400px;
+    width: 100%;
+    animation: popIn 0.8s cubic-bezier(.68,-0.55,.27,1.55);
+}
+
+@keyframes popIn {
+    0% { transform: scale(0.7); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+h1 {
+    font-size: 2rem;
+    color: #ff7e5f;
+    margin-bottom: 18px;
+    letter-spacing: 1px;
+    font-weight: bold;
+}
+
+label {
+    display: block;
+    margin: 18px 0 6px 0;
+    color: #4f4f4f;
+    font-weight: 500;
+    text-align: left;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+input[type="date"],
+select {
+    width: 100%;
+    padding: 10px 12px;
+    margin-bottom: 10px;
+    border: 1px solid #ffd6c0;
+    border-radius: 8px;
+    font-size: 1rem;
+    background: #fff8f3;
+    transition: border 0.2s;
+    box-sizing: border-box;
+}
+
+input:focus, select:focus {
+    border: 1.5px solid #ff7e5f;
+    outline: none;
+}
+
+.btn {
+    padding: 12px 0;
+    border: none;
+    border-radius: 20px;
+    background: linear-gradient(90deg, #ff7e5f, #feb47b);
+    color: #fff;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 4px 16px rgba(255,126,95,0.15);
+    transition: transform 0.2s, box-shadow 0.2s, background 0.3s;
+    width: 100%;
+    margin-top: 16px;
+}
+
+.btn:hover {
+    transform: scale(1.04);
+    background: linear-gradient(90deg, #feb47b, #ff7e5f);
+    box-shadow: 0 8px 24px rgba(255,126,95,0.18);
+}
+
+#mensaje {
+    margin-top: 18px;
+    color: #43cea2;
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+@media (max-width: 500px) {
+    .container {
+        padding: 24px 8px 16px 8px;
+        min-width: unset;
+        max-width: 98vw;
+    }
+    h1 {
+        font-size: 1.3rem;
+    }
+}
