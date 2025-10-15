@@ -95,6 +95,14 @@
             border-radius:10px; 
             padding:12px 18px;
         }
+        .info-extra {
+            margin-bottom:18px; 
+            text-align:left; 
+            background:#e9f6ff; 
+            border-radius:10px; 
+            padding:12px 18px;
+            font-size: 0.98em;
+        }
         .btn-ver {
             margin: 8px 4px 8px 0;
             padding: 8px 18px;
@@ -149,42 +157,45 @@
         </div>
     </div>
     <script>
-    // --- Información básica de los pacientes ---
+    // --- Información básica de los pacientes (para la tabla y gráfico) ---
     const infoPacientes = {
-        P001: { nombre: "P001", edad: 52, diagnostico: "Cervicalgia crónica", grupo: "Ondas" },
-        P002: { nombre: "P002", edad: 47, diagnostico: "Dolor neuropático", grupo: "Ondas" },
-        P003: { nombre: "P003", edad: 60, diagnostico: "Ciática", grupo: "Ondas" },
-        P004: { nombre: "P004", edad: 55, diagnostico: "Lumbalgia crónica", grupo: "Ondas" },
-        P005: { nombre: "P005", edad: 49, diagnostico: "Lumbalgia crónica", grupo: "Música" },
-        P006: { nombre: "P006", edad: 44, diagnostico: "Fibromialgia y depresión", grupo: "Música" },
-        P007: { nombre: "P007", edad: 38, diagnostico: "Migraña crónica y depresión", grupo: "Música" }
+        P001: { nombre: "P001", edad: 59, diagnostico: "Cervicalgia crónica", grupo: "Ondas" },
+        P002: { nombre: "P002", edad: 56, diagnostico: "Dolor neuropático", grupo: "Ondas" },
+        P003: { nombre: "P003", edad: 38, diagnostico: "Ciática", grupo: "Ondas" },
+        P004: { nombre: "P004", edad: 61, diagnostico: "Lumbalgia crónica", grupo: "Ondas" },
+        P005: { nombre: "P005", edad: 42, diagnostico: "Lumbalgia crónica", grupo: "Música" },
+        P006: { nombre: "P006", edad: 50, diagnostico: "Fibromialgia y depresión", grupo: "Música" },
+        P007: { nombre: "P007", edad: 45, diagnostico: "Migraña crónica y depresión", grupo: "Música" }
     };
 
+    // --- Mostrar datos del paciente ---
     function cerrarModal() {
         document.getElementById('modalPaciente').classList.remove('active');
         if (window.graficoDolorObj) window.graficoDolorObj.destroy();
     }
 
     function mostrarDatosPaciente(nombre) {
+        // Datos extra de datos_pacientes.js
+        const extra = (typeof datosPacientes !== "undefined" && datosPacientes[nombre]) ? datosPacientes[nombre] : {};
+        // Datos simulados de respuestas (para demo GitHub Pages)
+        // Puedes poner aquí los datos reales si los tienes, o simularlos como ejemplo:
         let mes = "2025-07";
         let dias = 31;
+        // Simulación de respuestas para demo (puedes personalizar)
         let datos = [];
         for (let d = 1; d <= dias; d++) {
-            let diaStr = d.toString().padStart(2, '0');
-            let fecha = mes + '-' + diaStr;
-            let key = "calendario_" + nombre + "_" + fecha;
-            let lista = JSON.parse(localStorage.getItem(key) || "[]");
-            if (lista.length > 0) {
-                let reg = lista[0];
-                reg.fecha = fecha;
-                datos.push(reg);
-            }
-        }
-        if (!datos.length) {
-            document.getElementById('tablaModal').innerHTML = "<p>No hay registros para este paciente.</p>";
-            document.getElementById('modalTitulo').textContent = "";
-            document.getElementById('modalPaciente').classList.add('active');
-            return;
+            datos.push({
+                fecha: `${mes}-${d.toString().padStart(2, '0')}`,
+                dolorMin: Math.max(0, 7 - Math.floor(d/7) + (nombre === "P004" ? 1 : 0)), // P004 no mejora
+                dolorMax: Math.max(0, 8 - Math.floor(d/7) + (nombre === "P004" ? 1 : 0)),
+                emocion: ["Bien","Regular","Mal"][d%3],
+                afectaActividades: d%2===0 ? "Sí" : "No",
+                sueno: ["Bien","Mal"][d%2],
+                musicaHoy: ["Sí","No"][d%2],
+                movilidad: ["Alta","Media","Baja"][d%3],
+                momentoPeorDolor: ["Mañana","Tarde","Noche"][d%3],
+                tiempoDolor: `${2+d%3}h`
+            });
         }
 
         // --- Info paciente ---
@@ -197,6 +208,15 @@
                 <b>Grupo:</b> ${info.grupo}
             </div>
         `;
+        let extraHtml = "";
+        if (extra) {
+            extraHtml = `<div class="info-extra">
+                <b>Descripción:</b> ${extra.nombre || ""}<br>
+                <b>Observaciones:</b> ${extra.observaciones || ""}<br>
+                <b>Recomendación:</b> ${extra.recomendacion || ""}<br>
+                <b>Objetivo:</b> ${extra.objetivo || ""}
+            </div>`;
+        }
 
         // Preguntas a mostrar
         const preguntas = [
@@ -225,7 +245,7 @@
             tabla += `</tr>`;
         });
         tabla += `</tbody></table>`;
-        document.getElementById('tablaModal').innerHTML = infoHtml + tabla;
+        document.getElementById('tablaModal').innerHTML = infoHtml + extraHtml + tabla;
         document.getElementById('modalTitulo').textContent = `Resultados de ${nombre} (Julio 2025)`;
         document.getElementById('modalPaciente').classList.add('active');
 
@@ -258,7 +278,6 @@
             {id:"P001", nombre:"P001"}, {id:"P002", nombre:"P002"}, {id:"P003", nombre:"P003"}, {id:"P004", nombre:"P004"},
             {id:"P005", nombre:"P005"}, {id:"P006", nombre:"P006"}, {id:"P007", nombre:"P007"}
         ];
-        // Puedes ajustar estos valores para que se vea el cambio mínimo
         let dolorInicio = [8, 7, 6, 9, 7, 8, 6];
         let dolorFin    = [7, 6, 5, 9, 6, 7, 5]; // P004 no mejora (9->9), los demás bajan 1 punto
         let grupo = ["Ondas","Ondas","Ondas","Ondas","Música","Música","Música"];
