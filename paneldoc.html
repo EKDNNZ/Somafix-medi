@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Panel Doctor - SomaFix</title>
     <link rel="stylesheet" href="mitodo.css">
-    <script src="datos_pacientes.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         .modal-bg {
@@ -157,49 +156,207 @@
         </div>
     </div>
     <script>
-    // --- Información básica de los pacientes (para la tabla y gráfico) ---
-    const infoPacientes = {
-        P001: { nombre: "P001", edad: 59, diagnostico: "Cervicalgia crónica", grupo: "Ondas" },
-        P002: { nombre: "P002", edad: 56, diagnostico: "Dolor neuropático", grupo: "Ondas" },
-        P003: { nombre: "P003", edad: 38, diagnostico: "Ciática", grupo: "Ondas" },
-        P004: { nombre: "P004", edad: 61, diagnostico: "Lumbalgia crónica", grupo: "Ondas" },
-        P005: { nombre: "P005", edad: 42, diagnostico: "Lumbalgia crónica", grupo: "Música" },
-        P006: { nombre: "P006", edad: 50, diagnostico: "Fibromialgia y depresión", grupo: "Música" },
-        P007: { nombre: "P007", edad: 45, diagnostico: "Migraña crónica y depresión", grupo: "Música" }
+    // Datos fijos para cada paciente (tabla y gráfico)
+    const pacientesDatos = {
+        P001: {
+            info: {
+                nombre: "P001",
+                edad: 59,
+                diagnostico: "Cervicalgia crónica",
+                grupo: "Ondas",
+                descripcion: "Hombre de 59 años con cervicalgia crónica.",
+                observaciones: "No presenta observaciones adicionales.",
+                recomendacion: "40 Hz + 432 Hz durante 30 minutos, preferiblemente por la mañana.",
+                objetivo: "Aliviar el dolor nervioso y reducir el estrés."
+            },
+            tabla: [
+                ["Dolor mínimo", 5, 5, 4, 4, 4, 3, 3],
+                ["Dolor máximo", 8, 7, 7, 6, 6, 5, 5],
+                ["Emoción", "Mal", "Regular", "Regular", "Bien", "Bien", "Bien", "Bien"],
+                ["Afecta actividades", "Sí", "Sí", "No", "No", "No", "No", "No"],
+                ["Sueño", "Mal", "Mal", "Bien", "Bien", "Bien", "Bien", "Bien"],
+                ["Música hoy", "No", "Sí", "Sí", "Sí", "Sí", "Sí", "Sí"],
+                ["Movilidad", "Baja", "Media", "Media", "Alta", "Alta", "Alta", "Alta"],
+                ["Peor momento", "Mañana", "Tarde", "Tarde", "Noche", "Noche", "Noche", "Noche"],
+                ["Tiempo dolor", "3h", "2h", "2h", "1h", "1h", "1h", "1h"]
+            ],
+            dias: ["01", "05", "10", "15", "20", "25", "31"],
+            dolorMin: [5, 5, 4, 4, 4, 3, 3],
+            dolorMax: [8, 7, 7, 6, 6, 5, 5]
+        },
+        P002: {
+            info: {
+                nombre: "P002",
+                edad: 56,
+                diagnostico: "Dolor neuropático",
+                grupo: "Ondas",
+                descripcion: "Hombre de 56 años con dolor neuropático.",
+                observaciones: "Presenta depresión y en alguna ocasión ha necesitado tomar opioides.",
+                recomendacion: "40 Hz + 9 Hz durante 40 minutos, por la mañana o por la tarde.",
+                objetivo: "Liberación emocional, mejora del estado de ánimo y alivio del dolor."
+            },
+            tabla: [
+                ["Dolor mínimo", 6, 6, 5, 5, 5, 4, 4],
+                ["Dolor máximo", 8, 8, 7, 7, 7, 6, 6],
+                ["Emoción", "Mal", "Regular", "Regular", "Bien", "Bien", "Bien", "Bien"],
+                ["Afecta actividades", "Sí", "Sí", "Sí", "No", "No", "No", "No"],
+                ["Sueño", "Mal", "Mal", "Bien", "Bien", "Bien", "Bien", "Bien"],
+                ["Música hoy", "No", "Sí", "Sí", "Sí", "Sí", "Sí", "Sí"],
+                ["Movilidad", "Baja", "Media", "Media", "Alta", "Alta", "Alta", "Alta"],
+                ["Peor momento", "Mañana", "Tarde", "Tarde", "Noche", "Noche", "Noche", "Noche"],
+                ["Tiempo dolor", "4h", "3h", "3h", "2h", "2h", "2h", "2h"]
+            ],
+            dias: ["01", "05", "10", "15", "20", "25", "31"],
+            dolorMin: [6, 6, 5, 5, 5, 4, 4],
+            dolorMax: [8, 8, 7, 7, 7, 6, 6]
+        },
+        P003: {
+            info: {
+                nombre: "P003",
+                edad: 38,
+                diagnostico: "Ciática",
+                grupo: "Ondas",
+                descripcion: "Mujer de 38 años con ciática.",
+                observaciones: "No presenta observaciones adicionales.",
+                recomendacion: "40 Hz + 174 Hz durante 30 minutos, preferentemente por la tarde.",
+                objetivo: "Alivio del dolor neuropático y relajación muscular."
+            },
+            tabla: [
+                ["Dolor mínimo", 4, 4, 3, 3, 3, 2, 2],
+                ["Dolor máximo", 7, 7, 6, 6, 6, 5, 5],
+                ["Emoción", "Regular", "Regular", "Bien", "Bien", "Bien", "Bien", "Bien"],
+                ["Afecta actividades", "Sí", "No", "No", "No", "No", "No", "No"],
+                ["Sueño", "Mal", "Bien", "Bien", "Bien", "Bien", "Bien", "Bien"],
+                ["Música hoy", "No", "Sí", "Sí", "Sí", "Sí", "Sí", "Sí"],
+                ["Movilidad", "Media", "Media", "Alta", "Alta", "Alta", "Alta", "Alta"],
+                ["Peor momento", "Tarde", "Tarde", "Noche", "Noche", "Noche", "Noche", "Noche"],
+                ["Tiempo dolor", "2h", "2h", "1h", "1h", "1h", "1h", "1h"]
+            ],
+            dias: ["01", "05", "10", "15", "20", "25", "31"],
+            dolorMin: [4, 4, 3, 3, 3, 2, 2],
+            dolorMax: [7, 7, 6, 6, 6, 5, 5]
+        },
+        P004: {
+            info: {
+                nombre: "P004",
+                edad: 61,
+                diagnostico: "Lumbalgia crónica",
+                grupo: "Ondas",
+                descripcion: "Hombre de 61 años con lumbalgia crónica.",
+                observaciones: "No hay observaciones adicionales.",
+                recomendacion: "432 Hz + 852 Hz durante 30 minutos, por la tarde o la noche.",
+                objetivo: "Alivio del dolor lumbar y reducción de la ansiedad."
+            },
+            tabla: [
+                ["Dolor mínimo", 7, 7, 7, 7, 7, 7, 7],
+                ["Dolor máximo", 9, 9, 9, 9, 9, 9, 9],
+                ["Emoción", "Mal", "Mal", "Mal", "Mal", "Mal", "Mal", "Mal"],
+                ["Afecta actividades", "Sí", "Sí", "Sí", "Sí", "Sí", "Sí", "Sí"],
+                ["Sueño", "Mal", "Mal", "Mal", "Mal", "Mal", "Mal", "Mal"],
+                ["Música hoy", "No", "No", "No", "No", "No", "No", "No"],
+                ["Movilidad", "Baja", "Baja", "Baja", "Baja", "Baja", "Baja", "Baja"],
+                ["Peor momento", "Noche", "Noche", "Noche", "Noche", "Noche", "Noche", "Noche"],
+                ["Tiempo dolor", "5h", "5h", "5h", "5h", "5h", "5h", "5h"]
+            ],
+            dias: ["01", "05", "10", "15", "20", "25", "31"],
+            dolorMin: [7, 7, 7, 7, 7, 7, 7],
+            dolorMax: [9, 9, 9, 9, 9, 9, 9]
+        },
+        P005: {
+            info: {
+                nombre: "P005",
+                edad: 42,
+                diagnostico: "Lumbalgia crónica",
+                grupo: "Música",
+                descripcion: "Mujer de 42 años con lumbalgia crónica.",
+                observaciones: "No hay observaciones adicionales.",
+                recomendacion: "432 Hz + 852 Hz durante 30 minutos, por la tarde o la noche.",
+                objetivo: "Alivio del dolor lumbar y reducción de la ansiedad."
+            },
+            tabla: [
+                ["Dolor mínimo", 5, 5, 4, 4, 3, 3, 2],
+                ["Dolor máximo", 7, 7, 6, 6, 5, 5, 4],
+                ["Emoción", "Regular", "Regular", "Bien", "Bien", "Bien", "Bien", "Bien"],
+                ["Afecta actividades", "Sí", "No", "No", "No", "No", "No", "No"],
+                ["Sueño", "Mal", "Bien", "Bien", "Bien", "Bien", "Bien", "Bien"],
+                ["Música hoy", "No", "Sí", "Sí", "Sí", "Sí", "Sí", "Sí"],
+                ["Movilidad", "Media", "Alta", "Alta", "Alta", "Alta", "Alta", "Alta"],
+                ["Peor momento", "Tarde", "Noche", "Noche", "Noche", "Noche", "Noche", "Noche"],
+                ["Tiempo dolor", "3h", "2h", "2h", "1h", "1h", "1h", "1h"]
+            ],
+            dias: ["01", "05", "10", "15", "20", "25", "31"],
+            dolorMin: [5, 5, 4, 4, 3, 3, 2],
+            dolorMax: [7, 7, 6, 6, 5, 5, 4]
+        },
+        P006: {
+            info: {
+                nombre: "P006",
+                edad: 50,
+                diagnostico: "Fibromialgia y depresión",
+                grupo: "Música",
+                descripcion: "Mujer de 50 años con fibromialgia y depresión.",
+                observaciones: "",
+                recomendacion: "40 Hz + 528 Hz durante 40 minutos, por la mañana.",
+                objetivo: "Reducir el dolor generalizado, favorecer la liberación emocional y aumentar la vitalidad."
+            },
+            tabla: [
+                ["Dolor mínimo", 6, 6, 5, 5, 4, 4, 3],
+                ["Dolor máximo", 8, 8, 7, 7, 6, 6, 5],
+                ["Emoción", "Mal", "Regular", "Regular", "Bien", "Bien", "Bien", "Bien"],
+                ["Afecta actividades", "Sí", "Sí", "No", "No", "No", "No", "No"],
+                ["Sueño", "Mal", "Mal", "Bien", "Bien", "Bien", "Bien", "Bien"],
+                ["Música hoy", "No", "Sí", "Sí", "Sí", "Sí", "Sí", "Sí"],
+                ["Movilidad", "Baja", "Media", "Media", "Alta", "Alta", "Alta", "Alta"],
+                ["Peor momento", "Mañana", "Tarde", "Tarde", "Noche", "Noche", "Noche", "Noche"],
+                ["Tiempo dolor", "4h", "3h", "3h", "2h", "2h", "2h", "2h"]
+            ],
+            dias: ["01", "05", "10", "15", "20", "25", "31"],
+            dolorMin: [6, 6, 5, 5, 4, 4, 3],
+            dolorMax: [8, 8, 7, 7, 6, 6, 5]
+        },
+        P007: {
+            info: {
+                nombre: "P007",
+                edad: 45,
+                diagnostico: "Migraña crónica y depresión",
+                grupo: "Música",
+                descripcion: "Hombre de 45 años con migraña crónica y depresión.",
+                observaciones: "",
+                recomendacion: "40 Hz + 432 Hz durante 30 minutos, por la mañana.",
+                objetivo: "Reducir la intensidad de la migraña y mejorar el estado de ánimo."
+            },
+            tabla: [
+                ["Dolor mínimo", 5, 5, 4, 4, 3, 3, 2],
+                ["Dolor máximo", 6, 6, 5, 5, 4, 4, 3],
+                ["Emoción", "Regular", "Regular", "Bien", "Bien", "Bien", "Bien", "Bien"],
+                ["Afecta actividades", "Sí", "No", "No", "No", "No", "No", "No"],
+                ["Sueño", "Mal", "Bien", "Bien", "Bien", "Bien", "Bien", "Bien"],
+                ["Música hoy", "No", "Sí", "Sí", "Sí", "Sí", "Sí", "Sí"],
+                ["Movilidad", "Media", "Alta", "Alta", "Alta", "Alta", "Alta", "Alta"],
+                ["Peor momento", "Tarde", "Noche", "Noche", "Noche", "Noche", "Noche", "Noche"],
+                ["Tiempo dolor", "3h", "2h", "2h", "1h", "1h", "1h", "1h"]
+            ],
+            dias: ["01", "05", "10", "15", "20", "25", "31"],
+            dolorMin: [5, 5, 4, 4, 3, 3, 2],
+            dolorMax: [6, 6, 5, 5, 4, 4, 3]
+        }
     };
 
-    // --- Mostrar datos del paciente ---
     function cerrarModal() {
         document.getElementById('modalPaciente').classList.remove('active');
         if (window.graficoDolorObj) window.graficoDolorObj.destroy();
     }
 
     function mostrarDatosPaciente(nombre) {
-        // Datos extra de datos_pacientes.js
-        const extra = (typeof datosPacientes !== "undefined" && datosPacientes[nombre]) ? datosPacientes[nombre] : {};
-        // Datos simulados de respuestas (para demo GitHub Pages)
-        // Puedes poner aquí los datos reales si los tienes, o simularlos como ejemplo:
-        let mes = "2025-07";
-        let dias = 31;
-        // Simulación de respuestas para demo (puedes personalizar)
-        let datos = [];
-        for (let d = 1; d <= dias; d++) {
-            datos.push({
-                fecha: `${mes}-${d.toString().padStart(2, '0')}`,
-                dolorMin: Math.max(0, 7 - Math.floor(d/7) + (nombre === "P004" ? 1 : 0)), // P004 no mejora
-                dolorMax: Math.max(0, 8 - Math.floor(d/7) + (nombre === "P004" ? 1 : 0)),
-                emocion: ["Bien","Regular","Mal"][d%3],
-                afectaActividades: d%2===0 ? "Sí" : "No",
-                sueno: ["Bien","Mal"][d%2],
-                musicaHoy: ["Sí","No"][d%2],
-                movilidad: ["Alta","Media","Baja"][d%3],
-                momentoPeorDolor: ["Mañana","Tarde","Noche"][d%3],
-                tiempoDolor: `${2+d%3}h`
-            });
+        const paciente = pacientesDatos[nombre];
+        if (!paciente) {
+            document.getElementById('tablaModal').innerHTML = "<p>No hay registros para este paciente.</p>";
+            document.getElementById('modalTitulo').textContent = "";
+            document.getElementById('modalPaciente').classList.add('active');
+            return;
         }
-
-        // --- Info paciente ---
-        let info = infoPacientes[nombre];
+        // Info paciente
+        let info = paciente.info;
         let infoHtml = `
             <div class="info-paciente">
                 <b>Nombre:</b> ${info.nombre}<br>
@@ -207,61 +364,41 @@
                 <b>Diagnóstico:</b> ${info.diagnostico}<br>
                 <b>Grupo:</b> ${info.grupo}
             </div>
+            <div class="info-extra">
+                <b>Descripción:</b> ${info.descripcion || ""}<br>
+                <b>Observaciones:</b> ${info.observaciones || ""}<br>
+                <b>Recomendación:</b> ${info.recomendacion || ""}<br>
+                <b>Objetivo:</b> ${info.objetivo || ""}
+            </div>
         `;
-        let extraHtml = "";
-        if (extra) {
-            extraHtml = `<div class="info-extra">
-                <b>Descripción:</b> ${extra.nombre || ""}<br>
-                <b>Observaciones:</b> ${extra.observaciones || ""}<br>
-                <b>Recomendación:</b> ${extra.recomendacion || ""}<br>
-                <b>Objetivo:</b> ${extra.objetivo || ""}
-            </div>`;
-        }
-
-        // Preguntas a mostrar
-        const preguntas = [
-            {campo:"dolorMin", texto:"Dolor mínimo"},
-            {campo:"dolorMax", texto:"Dolor máximo"},
-            {campo:"emocion", texto:"Emoción"},
-            {campo:"afectaActividades", texto:"Afecta actividades"},
-            {campo:"sueno", texto:"Sueño"},
-            {campo:"musicaHoy", texto:"Música hoy"},
-            {campo:"movilidad", texto:"Movilidad"},
-            {campo:"momentoPeorDolor", texto:"Peor momento"},
-            {campo:"tiempoDolor", texto:"Tiempo dolor"}
-        ];
-
-        // Tabla dinámica: días arriba, preguntas a la izquierda
+        // Tabla
         let tabla = `<table class="tabla-dinamica"><thead><tr><th>Pregunta / Día</th>`;
-        datos.forEach(reg => {
-            tabla += `<th>${reg.fecha.slice(-2)}</th>`;
+        paciente.dias.forEach(dia => {
+            tabla += `<th>${dia}</th>`;
         });
         tabla += `</tr></thead><tbody>`;
-        preguntas.forEach(p => {
-            tabla += `<tr><th>${p.texto}</th>`;
-            datos.forEach(reg => {
-                tabla += `<td>${reg[p.campo] ?? ''}</td>`;
-            });
+        paciente.tabla.forEach(row => {
+            tabla += `<tr><th>${row[0]}</th>`;
+            for (let i = 1; i < row.length; i++) {
+                tabla += `<td>${row[i]}</td>`;
+            }
             tabla += `</tr>`;
         });
         tabla += `</tbody></table>`;
-        document.getElementById('tablaModal').innerHTML = infoHtml + extraHtml + tabla;
+        document.getElementById('tablaModal').innerHTML = infoHtml + tabla;
         document.getElementById('modalTitulo').textContent = `Resultados de ${nombre} (Julio 2025)`;
         document.getElementById('modalPaciente').classList.add('active');
 
         // Gráfico de dolor
-        let labels = datos.map(r => r.fecha.slice(-2));
-        let dolorMin = datos.map(r => r.dolorMin ?? null);
-        let dolorMax = datos.map(r => r.dolorMax ?? null);
         let ctx = document.getElementById('graficoDolor').getContext('2d');
         if (window.graficoDolorObj) window.graficoDolorObj.destroy();
         window.graficoDolorObj = new Chart(ctx, {
             type: 'line',
             data: {
-                labels: labels,
+                labels: paciente.dias,
                 datasets: [
-                    { label: 'Dolor mínimo', data: dolorMin, borderColor: '#4fd1c5', backgroundColor: '#4fd1c588', fill: false, tension: 0.2 },
-                    { label: 'Dolor máximo', data: dolorMax, borderColor: '#5b7fff', backgroundColor: '#5b7fff88', fill: false, tension: 0.2 }
+                    { label: 'Dolor mínimo', data: paciente.dolorMin, borderColor: '#4fd1c5', backgroundColor: '#4fd1c588', fill: false, tension: 0.2 },
+                    { label: 'Dolor máximo', data: paciente.dolorMax, borderColor: '#5b7fff', backgroundColor: '#5b7fff88', fill: false, tension: 0.2 }
                 ]
             },
             options: {
@@ -273,20 +410,16 @@
 
     // --- Comparativa de mejora entre pacientes ---
     function mostrarComparativa() {
-        // Simulación: la mayoría mejora poco, uno no mejora nada (P004)
-        let pacientes = [
-            {id:"P001", nombre:"P001"}, {id:"P002", nombre:"P002"}, {id:"P003", nombre:"P003"}, {id:"P004", nombre:"P004"},
-            {id:"P005", nombre:"P005"}, {id:"P006", nombre:"P006"}, {id:"P007", nombre:"P007"}
-        ];
-        let dolorInicio = [8, 7, 6, 9, 7, 8, 6];
-        let dolorFin    = [7, 6, 5, 9, 6, 7, 5]; // P004 no mejora (9->9), los demás bajan 1 punto
-        let grupo = ["Ondas","Ondas","Ondas","Ondas","Música","Música","Música"];
+        let pacientes = Object.keys(pacientesDatos);
+        let dolorInicio = pacientes.map(p => pacientesDatos[p].dolorMax[0]);
+        let dolorFin = pacientes.map(p => pacientesDatos[p].dolorMax[6]);
+        let grupo = pacientes.map(p => pacientesDatos[p].info.grupo);
         let ctx = document.getElementById('graficoComparativa').getContext('2d');
         if (window.graficoComparativaObj) window.graficoComparativaObj.destroy();
         window.graficoComparativaObj = new Chart(ctx, {
             type: 'bar',
             data: {
-                labels: pacientes.map(p=>p.nombre),
+                labels: pacientes,
                 datasets: [
                     { label: 'Dolor máximo Día 1', data: dolorInicio, backgroundColor: grupo.map(g=>g=="Música"?"#4fd1c5":"#5b7fff") },
                     { label: 'Dolor máximo Día 31', data: dolorFin, backgroundColor: grupo.map(g=>g=="Música"?"#4fd1c588":"#5b7fff88") }
