@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Mi Día Doctor - SomaFix</title>
+    <link rel="stylesheet" href="css/mitodo.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Mi Día (Doctor)</h1>
+        <label>Selecciona fecha para ver/borrar tests:</label>
+        <input type="date" id="fecha">
+        <div id="listaTests"></div>
+        <button class="btn" onclick="window.history.back()">Volver</button>
+    </div>
+    <script>
+        // Pacientes válidos
+        const pacientes = [];
+        for(let i=1; i<=11; i++) {
+            let num = i.toString().padStart(3, '0');
+            pacientes.push('P'+num);
+        }
+
+        document.getElementById('fecha').onchange = function() {
+            let fecha = this.value;
+            let cont = document.getElementById('listaTests');
+            cont.innerHTML = "";
+            pacientes.forEach(function(nombre) {
+                let key = "calendario_" + nombre + "_" + fecha;
+                let lista = JSON.parse(localStorage.getItem(key) || "[]");
+                if (lista.length > 0) {
+                    let div = document.createElement('div');
+                    div.innerHTML = `<b>${nombre}</b>`;
+                    lista.forEach(function(reg, idx) {
+                        let p = document.createElement('p');
+                        p.innerHTML = `
+                            Dolor mínimo: ${reg.dolorMin} | Dolor máximo: ${reg.dolorMax}<br>
+                            Peor momento: ${reg.momentoPeorDolor} | Tiempo dolor: ${reg.tiempoDolor}<br>
+                            Afecta actividades: ${reg.afectaActividades}<br>
+                            Emoción: ${reg.emocion} | Música ayuda: ${reg.musicaAyuda}<br>
+                            Movilidad: ${reg.movilidad} | Sueño: ${reg.sueno}<br>
+                            Música hoy: ${reg.musicaHoy} | Tipo música: ${reg.tipoMusica} ${reg.otroTipoMusica ? '('+reg.otroTipoMusica+')' : ''}<br>
+                            Después música: ${reg.despuesMusica}
+                        `;
+                        let btn = document.createElement('button');
+                        btn.textContent = "Borrar este test";
+                        btn.className = "btn";
+                        btn.onclick = function() {
+                            lista.splice(idx, 1);
+                            localStorage.setItem(key, JSON.stringify(lista));
+                            document.getElementById('fecha').onchange();
+                        };
+                        p.appendChild(btn);
+                        div.appendChild(p);
+                    });
+                    // Botón para borrar todos los tests de ese día para ese paciente
+                    let btnAll = document.createElement('button');
+                    btnAll.textContent = "Borrar todos los tests de este día";
+                    btnAll.className = "btn";
+                    btnAll.onclick = function() {
+                        localStorage.removeItem(key);
+                        document.getElementById('fecha').onchange();
+                    };
+                    div.appendChild(btnAll);
+                    cont.appendChild(div);
+                }
+            });
+        };
+    </script>
+</body>
+</html>
