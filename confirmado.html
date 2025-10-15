@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>¡Registro confirmado! - SomaFix</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/paneles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>¡Registro confirmado!</h1>
+        <p>Tu cuenta ha sido activada correctamente.<br>
+        ¡Ya puedes empezar a registrar tu día!</p>
+        <button class="btn" id="irPanel">Ir a mi panel</button>
+        <p id="errorMsg" style="color:red;"></p>
+    </div>
+    <script>
+        document.getElementById('irPanel').onclick = function() {
+            const tipo = localStorage.getItem('sesionTipo');
+            if (tipo === 'doctor') {
+                window.location.href = 'principal_doctor.html';
+            } else if (tipo === 'paciente') {
+                window.location.href = 'principal_paciente.html';
+            } else {
+                document.getElementById('errorMsg').textContent = 'No hay sesión activa. Inicia sesión de nuevo.';
+            }
+        }
+    </script>
+</body>
+</html>
