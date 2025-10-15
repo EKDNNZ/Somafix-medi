@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Mi Día - SomaFix</title>
+    <link rel="stylesheet" href="css/mitodo.css">
+</head>
+<body>
+    <div class="container">
+        <h1>¿Cómo ha ido tu día?</h1>
+        <form id="formDia">
+            <h2>🟠 Dolor</h2>
+            <label>¿Cuál ha sido el dolor mínimo que has tenido hoy? (0-10)</label>
+            <input type="number" id="dolorMin" min="0" max="10" required>
+            <label>¿Cuál ha sido el dolor máximo que has tenido hoy? (0-10)</label>
+            <input type="number" id="dolorMax" min="0" max="10" required>
+            <label>¿En qué momento del día has tenido el peor dolor?</label>
+            <select id="momentoPeorDolor" required>
+                <option value="">Selecciona</option>
+                <option>Mañana (7h–13h)</option>
+                <option>Mediodía (13h–17h)</option>
+                <option>Tarde (17h–20h)</option>
+                <option>Noche (20h–24h)</option>
+                <option>Madrugada (00h–7h)</option>
+            </select>
+            <label>¿Durante cuánto tiempo has tenido dolor hoy?</label>
+            <select id="tiempoDolor" required>
+                <option value="">Selecciona</option>
+                <option>Menos de 30 minutos</option>
+                <option>Entre 30 minutos y 2 horas</option>
+                <option>Más de 2 horas</option>
+                <option>Todo el día</option>
+            </select>
+            <label>¿Cómo ha afectado el dolor a tus actividades diarias?</label>
+            <select id="afectaActividades" required>
+                <option value="">Selecciona</option>
+                <option>Nada</option>
+                <option>Poco</option>
+                <option>Bastante</option>
+                <option>Mucho</option>
+            </select>
+            <h2>🟣 Estado emocional</h2>
+            <label>¿Cómo te has sentido emocionalmente hoy?</label>
+            <select id="emocion" required>
+                <option value="">Selecciona</option>
+                <option>Tranquilo/a</option>
+                <option>Ansioso/a</option>
+                <option>Triste</option>
+                <option>Irritable</option>
+                <option>Feliz</option>
+            </select>
+            <label>¿Crees que la música te ha ayudado a sentirte mejor hoy?</label>
+            <select id="musicaAyuda" required>
+                <option value="">Selecciona</option>
+                <option>Sí</option>
+                <option>No</option>
+                <option>No estoy seguro/a</option>
+            </select>
+            <h2>🔵 Actividad y descanso</h2>
+            <label>¿Has podido caminar o moverte con facilidad hoy?</label>
+            <select id="movilidad" required>
+                <option value="">Selecciona</option>
+                <option>Sí</option>
+                <option>Con dificultad</option>
+                <option>No</option>
+            </select>
+            <label>¿Cómo has dormido esta noche?</label>
+            <select id="sueno" required>
+                <option value="">Selecciona</option>
+                <option>Muy bien</option>
+                <option>Bien</option>
+                <option>Mal</option>
+                <option>No he podido dormir</option>
+            </select>
+            <h2>🟢 Intervención musical</h2>
+            <label>¿Has escuchado música hoy según las recomendaciones?</label>
+            <select id="musicaHoy" required>
+                <option value="">Selecciona</option>
+                <option>Sí, durante todo el tiempo</option>
+                <option>Un rato</option>
+                <option>No</option>
+            </select>
+            <label>¿Qué tipo de música has escuchado?</label>
+            <select id="tipoMusica" required>
+                <option value="">Selecciona</option>
+                <option>Relajante</option>
+                <option>Alegre</option>
+                <option>Triste</option>
+                <option>Otro</option>
+            </select>
+            <input type="text" id="otroTipoMusica" placeholder="Si elegiste 'Otro', especifica aquí">
+            <label>Después de escuchar música, ¿cómo te has sentido?</label>
+            <select id="despuesMusica" required>
+                <option value="">Selecciona</option>
+                <option>Más tranquilo/a</option>
+                <option>Igual</option>
+                <option>Más inquieto/a</option>
+            </select>
+            <label>Fecha</label>
+            <input type="date" id="fecha" required>
+            <button class="btn" type="submit">Guardar</button>
+        </form>
+        <div id="mensaje"></div>
+        <button class="btn" onclick="window.history.back()">Volver</button>
+    </div>
+    <script>
+        document.getElementById('formDia').onsubmit = function(e) {
+            e.preventDefault();
+            let nombre = localStorage.getItem('sesionNombre');
+            let fecha = document.getElementById('fecha').value;
+            let registro = {
+                dolorMin: document.getElementById('dolorMin').value,
+                dolorMax: document.getElementById('dolorMax').value,
+                momentoPeorDolor: document.getElementById('momentoPeorDolor').value,
+                tiempoDolor: document.getElementById('tiempoDolor').value,
+                afectaActividades: document.getElementById('afectaActividades').value,
+                emocion: document.getElementById('emocion').value,
+                musicaAyuda: document.getElementById('musicaAyuda').value,
+                movilidad: document.getElementById('movilidad').value,
+                sueno: document.getElementById('sueno').value,
+                musicaHoy: document.getElementById('musicaHoy').value,
+                tipoMusica: document.getElementById('tipoMusica').value,
+                otroTipoMusica: document.getElementById('otroTipoMusica').value,
+                despuesMusica: document.getElementById('despuesMusica').value
+            };
+            let key = "calendario_" + nombre + "_" + fecha;
+            let lista = JSON.parse(localStorage.getItem(key) || "[]");
+            lista.push(registro);
+            localStorage.setItem(key, JSON.stringify(lista));
+            document.getElementById('mensaje').textContent = "¡Tu día ha sido registrado!";
+            document.getElementById('formDia').reset();
+        }
+    </script>
+</body>
+</html>
