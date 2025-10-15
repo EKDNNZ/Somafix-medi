@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Iniciar Sesión Doctor - SomaFix</title>
+    <link rel="stylesheet" href="css/iniciar.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Iniciar Sesión Doctor</h1>
+        <form id="form-inicio-doctor" autocomplete="off">
+            <input type="text" id="nombreDoctorLogin" placeholder="Usuario (D001 o D002)" required>
+            <input type="password" id="passDoctorLogin" placeholder="Contraseña (001 o 002)" required>
+            <button type="submit" class="btn">Iniciar Sesión</button>
+        </form>
+        <p id="errorMsg" style="color:red;"></p>
+    </div>
+    <script>
+        // Cuentas predefinidas de doctores
+        const doctores = {
+            'D001': { nombre: 'D001', pass: '001' },
+            'D002': { nombre: 'D002', pass: '002' }
+        };
+
+        document.getElementById('form-inicio-doctor').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const nombre = document.getElementById('nombreDoctorLogin').value.trim().toUpperCase();
+            const pass = document.getElementById('passDoctorLogin').value.trim();
+            if (doctores[nombre] && doctores[nombre].pass === pass) {
+                localStorage.setItem('sesionTipo', 'doctor');
+                localStorage.setItem('sesionNombre', nombre);
+                window.location.href = 'paneldoc.html';
+            } else {
+                document.getElementById('errorMsg').textContent = 'Usuario o contraseña incorrectos.';
+            }
+        });
+    </script>
+</body>
+</html>
